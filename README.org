@@ -15,7 +15,7 @@ You can generate simple markup like so:
   (markup (:p "This is a simple example")) ;; => "<p>This is a simple example</p>"
 #+END_SRC
 
-When you want to hav a full document you can do something like:
+When you want to have a full document you can do something like:
 
 #+BEGIN_SRC elisp   
   (markup-html5
