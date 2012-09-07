@@ -1,0 +1,63 @@
+* Markup.el
+** What is `markup.el`?
+   `markup.el` is a library for Emacsen to easily generate markup code
+   from lisp. Essentially it´s an emacs lisp port of cl-markup (look
+   at: https://github.com/arielnetworks/cl-markup)
+
+** How to use it?
+
+
+
+You can generate simple markup like so:
+
+#+BEGIN_SRC elisp   
+  ;; simple example
+  (markup (:p "This is a simple example")) ;; => "<p>This is a simple example</p>"
+#+END_SRC
+
+When you want to hav a full document you can do something like:
+
+#+BEGIN_SRC elisp   
+  (markup-html5
+   (:div :style "border: 1px solid #000"
+         "Some content of the div!"))
+  ;; => "<!DOCTYPE html><html><div style=\"border: 1px solid #000\">Some content of the div!</div></html>"
+#+END_SRC
+
+You can even mix in some other expressions or variables:
+
+#+BEGIN_SRC elisp   
+  (let ((maximum 5))
+    (markup-html5
+     (:body
+      (:ul
+       (loop for x from 1 to maximum
+             collect
+             (markup (:li  x " / " maximum)))))))
+  ;; => "<!DOCTYPE html><html><body><ul><li>1 / 5</li><li>2 / 5</li><li>3 / 5</li><li>4 / 5</li><li>5 / 5</li></ul></body></html>"
+#+END_SRC
+
+** How to contribute?
+   1. Fork the repository
+   2. Create a feature branch
+   3. Do your changes
+   4. Do your testing
+   5. Create Pull Request
+
+** License
+   markup.el 
+   Emacs Lisp library for easily generating markup code from lisp.
+   Copyright by Arthur Leonard Andersen
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
