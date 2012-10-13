@@ -63,11 +63,21 @@
 (defun markup-escape-string (string)
   (with-temp-buffer
     (insert string)
-    (replace-string "&" "&amp;" nil (beginning-of-buffer))
-    (replace-string "<" "&lt;" nil (beginning-of-buffer))
-    (replace-string ">" "&gt;" nil (beginning-of-buffer))
-    (replace-string "'" "&#039;" nil (beginning-of-buffer))
-    (replace-string "\"" "&quot;" nil (beginning-of-buffer))
+    (goto-char (point-min))
+    (while (search-forward "&" nil t)
+      (replace-match "&amp;" nil t))
+    (goto-char (point-min))
+    (while (search-forward "<" nil t)
+      (replace-match "&lt;" nil t))
+    (goto-char (point-min))
+    (while (search-forward ">" nil t)
+      (replace-match "&gt;" nil t))
+    (goto-char (point-min))
+    (while (search-forward "'" nil t)
+      (replace-match "&#039;" nil t))
+    (goto-char (point-min))
+    (while (search-forward "\"" nil t)
+      (replace-match "&quot;" nil t))
     (buffer-string)))
 
 (defmacro markup-raw (&rest forms)
@@ -166,12 +176,8 @@ name, a list of attributes and the body of the form."
                         collect (markup-dirty-string-form elem))
                 (list (concat "</" name ">")))
        (if (eq *markup-language* :html)
-           (progn
-             (message (keyword-name *markup-language*))
-             (list ">"))
-         (progn
-           (message (keyword-name *markup-language*))
-           (list " />")))))))
+           (list ">")
+         (list " />"))))))
 
 (defun markup-doctype (lang)
   (case lang
