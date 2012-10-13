@@ -24,6 +24,10 @@
                  "<br style=\"clear: both;\" />")))
 
 
+(ert-deftest markup-class ()
+  (should (equal (markup (:div :class "someclass" "content"))
+              "<div class=\"someclass\">content</div>")))
+
 (ert-deftest markup-p-empty ()
   (should (equal (markup (:p nil))
                  "<p></p>")))
