@@ -118,3 +118,7 @@
 (ert-deftest markup-raw-with-nil ()
   (should (equal (markup (:p (markup-raw (let (x) x))))
                  "<p></p>")))
+
+(ert-deftest markup-xml ()
+  (should (equal (markup-xml (:xml (:sometag "somecontent")))
+                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?><xml><sometag>somecontent</sometag></xml>")))

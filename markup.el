@@ -222,7 +222,7 @@ name, a list of attributes and the body of the form."
 
 (defmacro markup-xml (&rest elements)
   `(markup-with-doctype :xml
-     (loop for element in elements
-           append (markup-element-to-string element))))
+     ,@(loop for element in elements
+             append `((markup-element-to-string ',element)))))
 
 (provide 'markup)
