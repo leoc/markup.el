@@ -160,24 +160,30 @@ name, a list of attributes and the body of the form."
                 "\""
                 " ")))))
 
-(defun markup-tag-to-string (tag)
-  (multiple-value-bind (name attributes body) (markup-parse-tag tag)
-    (nconc
-     (list (concat "<" name))
-     (let ((attribute-string (markup-attributes-to-string attributes)))
-       (if attribute-string
-           (cons " " attribute-string)))
-     (if body
-         (nconc (list ">")
-                (loop for elem in body
-                      if (markup-tagp elem)
-                        append (markup-tag-to-string elem)
-                      else
-                        collect (markup-dirty-string-form elem))
-                (list (concat "</" name ">")))
-       (if (eq *markup-language* :html)
-           (list ">")
-         (list " />"))))))
+(defun markup-element-to-string (tag)
+  (cond ((markup-tagp tag)
+         (multiple-value-bind (name attributes body) (markup-parse-tag tag)
+           (nconc
+            (list (concat "<" name))
+            (let ((attribute-string (markup-attributes-to-string attributes)))
+              (if attribute-string
+                  (cons " " attribute-string)))
+            (if body
+                (nconc (list ">")
+                       (loop for elem in body
+                             if (markup-tagp elem)
+                             append (markup-element-to-string elem)
+                             else
+                             collect (markup-dirty-string-form elem))
+                       (list (concat "</" name ">")))
+              (if (eq *markup-language* :html)
+                  (list ">")
+                (list " />"))))))
+        ((stringp tag)
+         `(,tag))
+        (t
+         `(,(markup-dirty-string-form tag)))))
+
 
 (defun markup-doctype (lang)
   (case lang
@@ -194,29 +200,29 @@ name, a list of attributes and the body of the form."
         (loop for element in body
               append (eval element)))))
 
-(defmacro markup (&rest tags)
+(defmacro markup (&rest elements)
   `(markup-write-strings
-    ,@(loop for tag in tags
-            append (markup-tag-to-string tag))))
+    ,@(loop for element in elements
+            append (markup-element-to-string element))))
 
 (defun markup* (&rest tags)
   (eval `(markup ,@tags)))
 
-(defmacro markup-html5 (&rest tags)
+(defmacro markup-html5 (&rest elements)
   `(markup-with-doctype :html5
-                        (markup-tag-to-string (cons :html ',tags))))
+                        (markup-element-to-string (cons :html ',elements))))
 
-(defmacro markup-html (&rest tags)
+(defmacro markup-html (&rest elements)
   `(markup-with-doctype :html
-                        (markup-tag-to-string (cons :html ',tags))))
+                        (markup-element-to-string (cons :html ',elements))))
 
-(defmacro markup-xhtml (&rest tags)
+(defmacro markup-xhtml (&rest elements)
   `(markup-with-doctype :xhtml
-                        (markup-tag-to-string (cons :html ',tags))))
+                        (markup-element-to-string (cons :html ',elements))))
 
-(defmacro markup-xml (&rest tags)
+(defmacro markup-xml (&rest elements)
   `(markup-with-doctype :xml
-     (loop for tag in ',tags
-           append (markup-tag-to-string tag))))
+     (loop for element in elements
+           append (markup-element-to-string element))))
 
 (provide 'markup)

@@ -44,6 +44,19 @@
   (should (equal (markup (:div :name "<script type=\"text/javascript\">alert();</script>" "<hoge>"))
                  "<div name=\"&lt;script type=&quot;text/javascript&quot;&gt;alert();&lt;/script&gt;\">&lt;hoge&gt;</div>")))
 
+(ert-deftest markup-direct-string ()
+  (should (equal (markup "test")
+                 "test")))
+
+(ert-deftest markup-direct-strings ()
+  (should (equal (markup "test" "test2" "test3")
+                 "testtest2test3")))
+
+(ert-deftest markup-function-in-markup-elements ()
+  (flet ((myfun () "some text"))
+    (should (equal (markup (myfun))
+                   "some text"))))
+
 (ert-deftest markup-variables ()
   (should (equal (let ((my-var "Some content!"))
                    (markup (:p my-var)))
