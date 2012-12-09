@@ -1,21 +1,14 @@
-;;; markup.el - Simple markup generation helpers.
-;;
+;;; markup.el --- Simple markup generation helpers.
+
 ;; Copyright (c) 2012 Arthur Leonard Andersen
 ;;
 ;; Author: Arthur Leonard Andersen <leoc.git@gmail.com>
 ;; URL: http://github.com/leoc/markup.el
 ;; Version: 1.0.0
-;; Keywords: convenience
-
+;; Keywords: Convenience, Markup, HTML
+;;
 ;; This file is not part of GNU Emacs.
-
-;;; Commentary:
-
-;; This is an emacs lisp port of the cl-markup library written in 2011
-;; by Eitarow Fukamachi.
-
-;;; License:
-
+;;
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
 ;; as published by the Free Software Foundation; either version 3
@@ -30,6 +23,11 @@
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
 ;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;; Boston, MA 02110-1301, USA.
+
+;;; Commentary:
+
+;; This is an emacs lisp port of the cl-markup library written in 2011
+;; by Eitarow Fukamachi.
 
 ;;; Code:
 
@@ -226,3 +224,5 @@ name, a list of attributes and the body of the form."
              append `((markup-element-to-string ',element)))))
 
 (provide 'markup)
+
+;;; markup.el ends here
