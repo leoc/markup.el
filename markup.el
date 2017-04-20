@@ -175,7 +175,7 @@ name, a list of attributes and the body of the form."
                              collect (markup-dirty-string-form elem))
                        (list (concat "</" name ">")))
               (if (eq *markup-language* :html)
-                  (list (concat "></" name ">"))
+                  (list (concat ">"))
                 (list " />"))))))
         ((stringp tag)
          `(,tag))
