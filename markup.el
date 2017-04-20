@@ -90,7 +90,7 @@
   "Stream to output the generated string. If this is nil, then just
 return as a string the result. t means *standard-output*.")
 
-(defvar *markup-language* :xhtml
+(defvar *markup-language* :html5
   "Valid markup languages are :html, :html5, :xhtml and :xml")
 
 (defun markup-should-escape-p (val)
@@ -174,9 +174,9 @@ name, a list of attributes and the body of the form."
                              else
                              collect (markup-dirty-string-form elem))
                        (list (concat "</" name ">")))
-              (if (eq *markup-language* :html)
-                  (list (concat ">"))
-                (list " />"))))))
+              (if (eq *markup-language* :xhtml)
+		  (list " />")
+		(list ">"))))))
         ((stringp tag)
          `(,tag))
         (t

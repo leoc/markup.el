@@ -18,11 +18,11 @@
 
 (ert-deftest markup-br ()
   (should (equal (markup (:br))
-                 "<br />")))
+                 "<br>")))
 
 (ert-deftest markup-br-attribute ()
   (should (equal (markup (:br :style "clear: both;"))
-                 "<br style=\"clear: both;\" />")))
+                 "<br style=\"clear: both;\">")))
 
 
 (ert-deftest markup-class ()
@@ -90,12 +90,12 @@
 
 (ert-deftest html5-br ()
   (should (equal (markup-html5 (:br))
-                 "<!DOCTYPE html><html><br /></html>")))
+                 "<!DOCTYPE html><html><br></html>")))
 
 (ert-deftest html5-content ()
   (should (equal (markup-html5 (:ul (loop for v in '("a" "b" "c")
                                    collect (markup (:li v (:br))))))
-                 "<!DOCTYPE html><html><ul><li>a<br /></li><li>b<br /></li><li>c<br /></li></ul></html>")))
+                 "<!DOCTYPE html><html><ul><li>a<br></li><li>b<br></li><li>c<br></li></ul></html>")))
 
 ;;; RAW & ESC
 
