@@ -1,3 +1,4 @@
+(require 'cl)
 (require 'ert)
 (require 'markup)
 
