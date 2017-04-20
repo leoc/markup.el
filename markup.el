@@ -6,6 +6,7 @@
 ;; URL: http://github.com/leoc/markup.el
 ;; Version: 2.0.0
 ;; Keywords: Convenience, Markup, HTML
+;; Package-Requires: ((cl-lib "0.5"))
 ;;
 ;; This file is not part of GNU Emacs.
 ;;
@@ -31,6 +32,8 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+
 (defun keyword-name (keyword)
   (substring (format "%s" keyword) 1 nil))
 
@@ -40,22 +43,22 @@
     (format "%s" val)))
 
 (defun map-group-if (pred list fn)
-  (loop
+  (cl-loop
    while list
    for cur = (pop list)
    for cur-res = (funcall pred cur)
    append
    (let ((res (nreverse
-               (loop with acc = (list cur)
-                     while list
-                     for x = (pop list)
-                     if (eq cur-res (funcall pred x)) do
-                       (push x acc)
-                     else do
-                       (progn (push x list)
-                              (return acc))
-                     finally
-                       (return acc)))))
+               (cl-loop with acc = (list cur)
+                        while list
+                        for x = (pop list)
+                        if (eq cur-res (funcall pred x)) do
+                        (push x acc)
+                        else do
+                        (progn (push x list)
+                               (cl-return acc))
+                        finally
+                        (cl-return acc)))))
      (if cur-res (list (apply fn res)) res))))
 
 (defun markup-escape-string (string)
@@ -83,8 +86,8 @@
 
 (defmacro markup-esc (&rest forms)
   `(list
-    ,@(loop for form in forms
-            collect (markup-escape-string-form form))))
+    ,@(cl-loop for form in forms
+               collect (markup-escape-string-form form))))
 
 (defvar *markup-output-stream* nil
   "Stream to output the generated string. If this is nil, then just
@@ -98,19 +101,19 @@ return as a string the result. t means *standard-output*.")
             (string= val (markup-escape-string val)))))
 
 (defmacro markup-write-strings (&rest strings)
-  (let ((s (gensym))
+  (let ((s (cl-gensym))
         (strings (map-group-if #'stringp strings
                                (lambda (&rest args)
                                  (apply #'concat args)))))
     `(if *markup-output-stream*
-         (progn ,@(loop for str in strings
-                        collect `(princ ,str *markup-output-stream*)))
+         (progn ,@(cl-loop for str in strings
+                           collect `(princ ,str *markup-output-stream*)))
        (with-output-to-string
-         ,@(loop for str in strings
-                 collect `(princ ,str))))))
+         ,@(cl-loop for str in strings
+                    collect `(princ ,str))))))
 
 (defmacro markup-escape-string-form (val)
-  (let ((val2 (gensym)))
+  (let ((val2 (cl-gensym)))
     `(let ((,val2 ,val))
        (if (markup-should-escape-p ,val2)
            `(markup-escape-string ,,val2)
@@ -118,8 +121,8 @@ return as a string the result. t means *standard-output*.")
 
 (defun markup-dirty-string-form (form)
   (cond
-   ((consp form) (let ((res (gensym))
-                       (r (gensym)))
+   ((consp form) (let ((res (cl-gensym))
+                       (r (cl-gensym)))
                    `(let* ((*markup-language* ,*markup-language*)
                            (,res ,form))
                       (if (listp ,res)
@@ -139,28 +142,28 @@ return as a string the result. t means *standard-output*.")
 (defun markup-parse-tag (tag)
   "Splits the tag from into its single parts. Returns a form with the tag
 name, a list of attributes and the body of the form."
-  (values
+  (cl-values
    (keyword-name (pop tag))
-   (loop while (and tag (keywordp (car tag)))
-         collect (pop tag)
-         collect (pop tag))
+   (cl-loop while (and tag (keywordp (car tag)))
+            collect (pop tag)
+            collect (pop tag))
    tag))
 
 (defun markup-attributes-to-string (attributes)
   "Converts the given attributes to a list of strings."
   (and (consp attributes)
        (butlast
-        (loop for (key val) on attributes by #'cddr
-              append
-              `(,(concat (downcase (keyword-name key))
-                        "=\"")
-                ,(markup-dirty-string-form val)
-                "\""
-                " ")))))
+        (cl-loop for (key val) on attributes by #'cddr
+                 append
+                 `(,(concat (downcase (keyword-name key))
+                            "=\"")
+                   ,(markup-dirty-string-form val)
+                   "\""
+                   " ")))))
 
 (defun markup-element-to-string (tag)
   (cond ((markup-tagp tag)
-         (multiple-value-bind (name attributes body) (markup-parse-tag tag)
+         (cl-multiple-value-bind (name attributes body) (markup-parse-tag tag)
            (nconc
             (list (concat "<" name))
             (let ((attribute-string (markup-attributes-to-string attributes)))
@@ -168,11 +171,11 @@ name, a list of attributes and the body of the form."
                   (cons " " attribute-string)))
             (if body
                 (nconc (list ">")
-                       (loop for elem in body
-                             if (markup-tagp elem)
-                             append (markup-element-to-string elem)
-                             else
-                             collect (markup-dirty-string-form elem))
+                       (cl-loop for elem in body
+                                if (markup-tagp elem)
+                                append (markup-element-to-string elem)
+                                else
+                                collect (markup-dirty-string-form elem))
                        (list (concat "</" name ">")))
               (if (eq *markup-language* :xhtml)
 		  (list " />")
@@ -184,7 +187,7 @@ name, a list of attributes and the body of the form."
 
 
 (defun markup-doctype (lang)
-  (case lang
+  (cl-case lang
     (:xml "<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
     (:html "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">")
     (:html5 "<!DOCTYPE html>")
@@ -195,13 +198,13 @@ name, a list of attributes and the body of the form."
   `(markup-write-strings
     ,(markup-doctype lang)
     ,@(let ((*markup-language* lang))
-        (loop for element in body
-              append (eval element)))))
+        (cl-loop for element in body
+                 append (eval element)))))
 
 (defmacro markup (&rest elements)
   `(markup-write-strings
-    ,@(loop for element in elements
-            append (markup-element-to-string element))))
+    ,@(cl-loop for element in elements
+               append (markup-element-to-string element))))
 
 (defun markup* (&rest tags)
   (eval `(markup ,@tags)))
@@ -220,8 +223,8 @@ name, a list of attributes and the body of the form."
 
 (defmacro markup-xml (&rest elements)
   `(markup-with-doctype :xml
-     ,@(loop for element in elements
-             append `((markup-element-to-string ',element)))))
+     ,@(cl-loop for element in elements
+                append `((markup-element-to-string ',element)))))
 
 (provide 'markup)
 
