@@ -4,7 +4,7 @@
 ;;
 ;; Author: Arthur Leonard Andersen <leoc.git@gmail.com>
 ;; URL: http://github.com/leoc/markup.el
-;; Version: 1.0.0
+;; Version: 2.0.0
 ;; Keywords: Convenience, Markup, HTML
 ;;
 ;; This file is not part of GNU Emacs.
